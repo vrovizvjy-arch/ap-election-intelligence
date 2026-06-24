@@ -172,7 +172,7 @@ async function loadRisks() {
     try {
         const API_RISK = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:8100/api'
-            : 'https://ap-election-backend.onrender.com/api';
+            : 'https://ap-election-intelligence.onrender.com/api';
         const [risksRes, sentRes, summaryRes] = await Promise.all([
             fetch(API_RISK + '/risks?min_risk=0.1'),
             fetch(API_RISK + '/intel/sentiment'),
