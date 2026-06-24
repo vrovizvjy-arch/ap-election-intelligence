@@ -1,0 +1,135 @@
+{
+  "records": [
+    {
+      "district": "Srikakulam",
+      "population": 2703118,
+      "male": 1348692,
+      "female": 1354426,
+      "literacy": 62.3,
+      "sex_ratio": 1004,
+      "density": 340,
+      "households": 702110
+    },
+    {
+      "district": "Vizianagaram",
+      "population": 2344474,
+      "male": 1168517,
+      "female": 1175957,
+      "literacy": 59.5,
+      "sex_ratio": 1006,
+      "density": 340,
+      "households": 609604
+    },
+    {
+      "district": "Visakhapatnam",
+      "population": 4290589,
+      "male": 2145128,
+      "female": 2145461,
+      "literacy": 68.0,
+      "sex_ratio": 1000,
+      "density": 340,
+      "households": 1115561
+    },
+    {
+      "district": "East Godavari",
+      "population": 5154296,
+      "male": 2578072,
+      "female": 2576224,
+      "literacy": 71.4,
+      "sex_ratio": 999,
+      "density": 470,
+      "households": 1340065
+    },
+    {
+      "district": "West Godavari",
+      "population": 3934966,
+      "male": 1970704,
+      "female": 1964262,
+      "literacy": 73.1,
+      "sex_ratio": 997,
+      "density": 430,
+      "households": 1022791
+    },
+    {
+      "district": "Krishna",
+      "population": 4535278,
+      "male": 2274615,
+      "female": 2260663,
+      "literacy": 74.5,
+      "sex_ratio": 994,
+      "density": 520,
+      "households": 1179041
+    },
+    {
+      "district": "Guntur",
+      "population": 4887813,
+      "male": 2446017,
+      "female": 2441796,
+      "literacy": 67.4,
+      "sex_ratio": 998,
+      "density": 430,
+      "households": 1270418
+    },
+    {
+      "district": "Prakasam",
+      "population": 3397764,
+      "male": 1711073,
+      "female": 1686691,
+      "literacy": 63.5,
+      "sex_ratio": 986,
+      "density": 230,
+      "households": 883235
+    },
+    {
+      "district": "Nellore",
+      "population": 2966557,
+      "male": 1490716,
+      "female": 1475841,
+      "literacy": 69.2,
+      "sex_ratio": 990,
+      "density": 290,
+      "households": 771244
+    },
+    {
+      "district": "Kadapa",
+      "population": 2934456,
+      "male": 1478793,
+      "female": 1455663,
+      "literacy": 67.9,
+      "sex_ratio": 984,
+      "density": 230,
+      "households": 762957
+    },
+    {
+      "district": "Chittoor",
+      "population": 4174064,
+      "male": 2099869,
+      "female": 2074195,
+      "literacy": 72.2,
+      "sex_ratio": 988,
+      "density": 280,
+      "households": 1085086
+    },
+    {
+      "district": "Anantapur",
+      "population": 4081148,
+      "male": 2067564,
+      "female": 2013584,
+      "literacy": 64.3,
+      "sex_ratio": 974,
+      "density": 220,
+      "housesholds": 1061032
+    },
+    {
+      "district": "Kurnool",
+      "population": 4056842,
+      "male": 2047190,
+      "female": 2009652,
+      "literacy": 61.1,
+      "sex_ratio": 982,
+      "density": 290,
+      "households": 1054697
+    }
+  ],
+  "source": "census_2011_seed"
+}

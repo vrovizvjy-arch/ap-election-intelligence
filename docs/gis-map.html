@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AP Command Center - Strategic GIS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+        .backdrop-blur-xl { backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+        .glass-panel { background: rgba(31, 41, 55, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glow-tertiary { box-shadow: 0 0 15px rgba(173, 198, 255, 0.3); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(173, 198, 255, 0.2); border-radius: 10px; }
+        @keyframes pulse-dot { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+        .status-pulse { position: relative; }
+        .status-pulse::after { content: ''; position: absolute; width: 8px; height: 8px; background: currentColor; border-radius: 50%; left: 0; top: 0; animation: pulse-dot 2s infinite; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "background": "#091421",
+                    "on-surface-variant": "#c6c6cd",
+                    "inverse-surface": "#d9e3f6",
+                    "tertiary-fixed": "#d8e2ff",
+                    "inverse-on-surface": "#27313f",
+                    "primary-container": "#0f172a",
+                    "primary-fixed": "#dae2fd",
+                    "surface-container-high": "#212b39",
+                    "outline-variant": "#45464d",
+                    "secondary-fixed": "#ffddb8",
+                    "inverse-primary": "#565e74",
+                    "on-tertiary": "#002e6a",
+                    "outline": "#909097",
+                    "error-container": "#93000a",
+                    "on-tertiary-container": "#357df1",
+                    "surface-bright": "#303a48",
+                    "on-secondary": "#472a00",
+                    "secondary-container": "#ee9800",
+                    "on-primary-fixed-variant": "#3f465c",
+                    "on-secondary-container": "#5b3800",
+                    "tertiary": "#adc6ff",
+                    "on-tertiary-fixed": "#001a42",
+                    "surface-container-highest": "#2b3544",
+                    "on-surface": "#d9e3f6",
+                    "on-error": "#690005",
+                    "on-primary-fixed": "#131b2e",
+                    "surface-variant": "#2b3544",
+                    "primary": "#bec6e0",
+                    "tertiary-container": "#00163a",
+                    "on-primary": "#283044",
+                    "secondary-fixed-dim": "#ffb95f",
+                    "on-secondary-fixed-variant": "#653e00",
+                    "surface-container-lowest": "#050f1c",
+                    "primary-fixed-dim": "#bec6e0",
+                    "on-background": "#d9e3f6",
+                    "tertiary-fixed-dim": "#adc6ff",
+                    "on-error-container": "#ffdad6",
+                    "on-tertiary-fixed-variant": "#004395",
+                    "on-primary-container": "#798098",
+                    "on-secondary-fixed": "#2a1700",
+                    "secondary": "#ffb95f",
+                    "surface-container": "#16202e",
+                    "surface-dim": "#091421",
+                    "surface": "#091421",
+                    "surface-tint": "#bec6e0",
+                    "surface-container-low": "#121c2a",
+                    "error": "#ffb4ab"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "sm": "8px",
+                    "xl": "48px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "container-max": "1440px",
+                    "md": "16px",
+                    "gutter": "20px"
+            },
+            "fontFamily": {
+                    "data-mono": ["JetBrains Mono"],
+                    "title-md": ["Inter"],
+                    "display-lg": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "label-caps": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Geist"]
+            },
+            "fontSize": {
+                    "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "title-md": ["18px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-tertiary/30 selection:text-tertiary overflow-hidden">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-xl border-b border-white/10 bg-background/60 backdrop-blur-xl">
+<div class="flex items-center gap-md">
+<span class="font-headline-lg text-headline-lg font-bold tracking-tighter text-primary">AP COMMAND CENTER</span>
+</div>
+<nav class="hidden md:flex items-center gap-lg">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-tertiary transition-colors duration-200" href="sentiment.html">LIVE FEED</a>
+<a class="font-label-caps text-label-caps text-tertiary border-b-2 border-tertiary pb-1" href="gis-map.html">INTEL MAP</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-tertiary transition-colors duration-200" href="risk-matrix.html">RISK MATRIX</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-tertiary transition-colors duration-200" href="turnout.html">FORECAST</a>
+</nav>
+<div class="flex items-center gap-md">
+<div class="relative hidden lg:block">
+<input class="bg-surface-container-low border border-outline/20 rounded-lg px-md py-xs text-sm w-64 focus:outline-none focus:border-tertiary/50 transition-all" placeholder="Search districts..." type="text"/>
+<span class="material-symbols-outlined absolute right-2 top-1.5 text-on-surface-variant text-sm">search</span>
+</div>
+<div class="flex items-center gap-sm">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-tertiary transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-tertiary transition-colors">settings</button>
+<button class="material-symbols-outlined text-primary">account_circle</button>
+</div>
+</div>
+</header>
+<!-- Main Layout Container -->
+<div class="flex h-screen pt-xl">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-xl h-[calc(100vh-48px)] flex flex-col z-40 border-r border-white/10 bg-surface-container-low/60 backdrop-blur-xl w-[260px] hidden md:flex">
+<div class="p-lg">
+<div class="flex items-center gap-sm mb-xs">
+<div class="w-8 h-8 bg-tertiary rounded flex items-center justify-center text-on-tertiary font-bold">AP</div>
+<div>
+<div class="font-title-md text-title-md text-primary leading-tight">STRATEGIC INTEL</div>
+<div class="font-label-caps text-[10px] text-on-surface-variant tracking-widest uppercase">ANDHRA PRADESH</div>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-sm space-y-unit">
+<a class="flex items-center gap-md px-md py-sm bg-tertiary/10 text-tertiary border-r-2 border-tertiary transition-all duration-200" href="gis-map.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="font-label-caps text-label-caps">GIS Map View</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-white/5 transition-all duration-200 hover:translate-x-1" href="sentiment.html">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-caps text-label-caps">Sentiment Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-white/5 transition-all duration-200 hover:translate-x-1" href="risk-matrix.html">
+<span class="material-symbols-outlined">warning</span>
+<span class="font-label-caps text-label-caps">Risk Matrix</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-white/5 transition-all duration-200 hover:translate-x-1" href="turnout.html">
+<span class="material-symbols-outlined">query_stats</span>
+<span class="font-label-caps text-label-caps">Turnout Simulator</span>
+</a>
+</nav>
+<div class="mt-auto p-sm border-t border-white/10">
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-caps text-label-caps">Support</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">check_circle</span>
+<span class="font-label-caps text-label-caps">System Status</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-0 md:ml-[260px] flex overflow-hidden">
+<!-- Left Sidebar: Stats & Metrics -->
+<section class="w-80 h-full glass-panel border-y-0 border-l-0 overflow-y-auto custom-scrollbar flex flex-col z-30">
+<div class="p-lg border-b border-white/5">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-md">PREDICTIVE SEAT TALLY</h2>
+<div class="grid grid-cols-2 gap-sm">
+<div class="bg-surface-container p-md rounded border border-white/5">
+<div class="text-[10px] font-label-caps text-tertiary mb-1">SAFE SEATS</div>
+<div class="text-2xl font-bold font-data-mono" id="safe-seats">82</div>
+</div>
+<div class="bg-surface-container p-md rounded border border-white/5">
+<div class="text-[10px] font-label-caps text-secondary mb-1">TOSS-UP</div>
+<div class="text-2xl font-bold font-data-mono" id="toss-up">45</div>
+</div>
+</div>
+</div>
+<div class="p-lg border-b border-white/5">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-md">VOTER SENTIMENT</h2>
+<div class="space-y-lg">
+<div>
+<div class="flex justify-between font-label-caps text-[11px] mb-xs">
+<span>ALLIANCE BLUE</span>
+<span class="text-tertiary" id="sent-alliance">54.2%</span>
+</div>
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-tertiary glow-tertiary" id="bar-alliance" style="width:54.2%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-caps text-[11px] mb-xs">
+<span>INCUMBENT AMBER</span>
+<span class="text-secondary" id="sent-incumbent">41.8%</span>
+</div>
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-secondary" id="bar-incumbent" style="width:41.8%"></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between font-label-caps text-[11px] mb-xs">
+<span>OTHERS</span>
+<span class="text-on-surface-variant" id="sent-others">4.0%</span>
+</div>
+<div class="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-on-surface-variant" id="bar-others" style="width:4%"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="p-lg">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant mb-md">RISK DISTRICTS</h2>
+<div class="space-y-sm" id="risk-districts">
+<!-- Populated by JS -->
+</div>
+</div>
+</section>
+<!-- Center Content: Interactive Map -->
+<section class="flex-1 relative bg-surface-container-lowest overflow-hidden">
+<div class="absolute top-md left-md z-10 flex gap-sm">
+<div class="glass-panel px-md py-sm rounded-lg flex items-center gap-sm">
+<span class="w-3 h-3 rounded-full bg-tertiary"></span>
+<span class="text-xs font-label-caps">Alliance Safe</span>
+</div>
+<div class="glass-panel px-md py-sm rounded-lg flex items-center gap-sm">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<span class="text-xs font-label-caps">Toss-up / Swing</span>
+</div>
+<div class="glass-panel px-md py-sm rounded-lg flex items-center gap-sm">
+<span class="w-3 h-3 rounded-full bg-error"></span>
+<span class="text-xs font-label-caps">Critical Risk</span>
+</div>
+</div>
+<div class="absolute bottom-md right-md z-10 flex flex-col gap-sm">
+<button class="glass-panel w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined">add</span>
+</button>
+<button class="glass-panel w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<button class="glass-panel w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined">my_location</span>
+</button>
+</div>
+<div id="ap-map" class="w-full h-full z-10"></div>
+</section>
+<!-- Right Sidebar: Data Stream -->
+<section class="w-72 h-full glass-panel border-y-0 border-r-0 flex flex-col z-30">
+<div class="p-md border-b border-white/5 flex justify-between items-center">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant">STRATEGIC DATA STREAM</h2>
+<span class="w-2 h-2 rounded-full bg-error status-pulse"></span>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-md space-y-md" id="data-stream">
+<!-- Populated by JS -->
+</div>
+<div class="p-md bg-surface-container-high/50 border-t border-white/5">
+<div class="flex items-center gap-sm mb-sm">
+<span class="material-symbols-outlined text-tertiary text-sm">shield_person</span>
+<span class="font-label-caps text-[10px]">AUTH_SESSION: ACTIVE</span>
+</div>
+<button class="w-full bg-tertiary text-on-tertiary font-label-caps py-sm rounded hover:brightness-110 transition-all flex items-center justify-center gap-sm">
+GENERATE BRIEFING
+<span class="material-symbols-outlined text-sm">download</span>
+</button>
+</div>
+</section>
+</main>
+</div>
+<!-- Mobile Bottom NavBar -->
+<nav class="md:hidden fixed bottom-0 w-full h-16 bg-surface-container-low/80 backdrop-blur-xl border-t border-white/10 flex justify-around items-center z-50">
+<a class="flex flex-col items-center gap-1 text-tertiary" href="gis-map.html">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">map</span>
+<span class="text-[10px] font-label-caps">GIS MAP</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="sentiment.html">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-label-caps">STATS</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="risk-matrix.html">
+<span class="material-symbols-outlined">warning</span>
+<span class="text-[10px] font-label-caps">RISKS</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-[10px] font-label-caps">USER</span>
+</a>
+</nav>
+<script>
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8100/api'
+  : 'https://ap-election-backend.onrender.com/api';
+
+// ---- Leaflet Interactive Map ----
+let map = null;
+let districtLayer = null;
+let currentPreds = {};
+
+function getColor(density) {
+  return density > 1500 ? '#1a3a5c' : density > 1100 ? '#1e4d6b' : density > 800 ? '#22607a' : density > 500 ? '#267389' : '#2a8698';
+}
+
+function styleDistrict(feature) {
+  const name = feature.properties.name;
+  const pred = currentPreds[name] || {};
+  const winner = (pred.parties || []).length > 0 ? pred.parties[0].name : null;
+  const fillColor = winner === 'YSRCP' ? '#2563eb' : winner === 'TDP' ? '#ea580c' : winner === 'JSP' ? '#ca8a04' : '#475569';
+  return {
+    fillColor: fillColor,
+    weight: 1.5,
+    opacity: 0.8,
+    color: '#1e293b',
+    fillOpacity: 0.7
+  };
+}
+
+function highlightFeature(e) {
+  const layer = e.target;
+  layer.setStyle({ weight: 3, color: '#facc15', fillOpacity: 0.9 });
+  layer.bringToFront();
+}
+
+function resetHighlight(e) {
+  if (districtLayer) {
+    districtLayer.resetStyle(e.target);
+  }
+}
+
+function zoomToFeature(e) {
+  map.fitBounds(e.target.getBounds());
+}
+
+async function initMap() {
+  map = L.map('ap-map', {
+    center: [15.9, 79.4],
+    zoom: 7,
+    zoomControl: false,
+    attributionControl: false
+  });
+
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19
+  }).addTo(map);
+
+  // Link +/- zoom buttons
+  document.querySelectorAll('.material-symbols-outlined').forEach(btn => {
+    if (btn.innerText === 'add') btn.parentElement.onclick = () => map.zoomIn();
+    if (btn.innerText === 'remove') btn.parentElement.onclick = () => map.zoomOut();
+    if (btn.innerText === 'my_location') btn.parentElement.onclick = () => map.setView([15.9, 79.4], 7);
+  });
+
+  const [summaryRes, geojsonRes] = await Promise.all([
+    fetch(API_BASE + '/summary'),
+    fetch(API_BASE + '/geojson')
+  ]);
+  const summary = await summaryRes.json();
+  const geojson = await geojsonRes.json();
+
+  // Build lookup from summary district details
+  const distMap = {};
+  (summary.district_details || []).forEach(d => { distMap[d.district] = d; });
+
+  currentPreds = distMap;
+
+  districtLayer = L.geoJSON(geojson, {
+    style: styleDistrict,
+    onEachFeature: function(feature, layer) {
+      const name = feature.properties.name;
+      const d = distMap[name] || {};
+      const p = feature.properties;
+      const partyStr = (d.parties || []).map(p => `${p.name} ${p.seats}`).join(' | ') || 'No data';
+      const winner = (d.parties || []).length > 0 ? d.parties[0].name : 'Unknown';
+      layer.bindPopup(`
+        <div style="font-family:monospace;background:#0f172a;color:#e2e8f0;padding:12px;min-width:220px;border:1px solid #334155;border-radius:8px">
+          <div style="font-size:14px;font-weight:700;color:#facc15;margin-bottom:8px">${name.toUpperCase()} DISTRICT</div>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:6px">
+            Pop: ${(p.pop_total/1000000).toFixed(2)}M | Literacy: ${p.literacy}% | Sex Ratio: ${p.sex_ratio}
+          </div>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:6px">
+            Density: ${p.density}/km² | ${p.pop_male?.toLocaleString()}♂ ${p.pop_female?.toLocaleString()}♀
+          </div>
+          <div style="border-top:1px solid #334155;padding-top:6px;font-size:12px;color:#e2e8f0">
+            <div style="color:#93c5fd;margin-bottom:4px">PREDICTED WINNER: <span style="color:#facc15;font-weight:700">${winner}</span></div>
+            <div style="font-size:10px;color:#94a3b8">${partyStr}</div>
+          </div>
+        </div>
+      `);
+      layer.on('mouseover', highlightFeature);
+      layer.on('mouseout', resetHighlight);
+      layer.on('click', zoomToFeature);
+    }
+  }).addTo(map);
+}
+
+initMap();
+
+// ---- Data Refresh (existing) ----
+async function loadData() {
+  try {
+    const [summaryRes, risksRes, streamRes, sentimentRes] = await Promise.all([
+      fetch(API_BASE + '/summary'),
+      fetch(API_BASE + '/risks'),
+      fetch(API_BASE + '/intel/stream'),
+      fetch(API_BASE + '/intel/sentiment')
+    ]);
+    const summary = await summaryRes.json();
+    const risks = await risksRes.json();
+    const stream = await streamRes.json();
+    const sentiment = await sentimentRes.json();
+
+    // Update seat tally
+    const party = summary.party_projection || {};
+    const total = summary.total_wards || 0;
+    const unanimous = summary.unanimous_wards || 0;
+    const contested = total - unanimous;
+    const safe = Object.entries(party).reduce((sum, [p, c]) => sum + c, 0);
+    document.getElementById('safe-seats').innerText = safe;
+    document.getElementById('toss-up').innerText = Math.max(0, contested - safe);
+
+    // Update sentiment bars
+    const entries = Object.entries(party).sort((a,b) => b[1]-a[1]);
+    if (entries.length >= 2) {
+      const totalVotes = entries.reduce((s, [,c]) => s + c, 0) || 1;
+      const p1 = (entries[0][1] / totalVotes * 100).toFixed(1);
+      const p2 = (entries[1][1] / totalVotes * 100).toFixed(1);
+      const p3 = (100 - p1 - p2).toFixed(1);
+      document.getElementById('sent-alliance').innerText = p1 + '%';
+      document.getElementById('bar-alliance').style.width = p1 + '%';
+      document.getElementById('sent-incumbent').innerText = p2 + '%';
+      document.getElementById('bar-incumbent').style.width = p2 + '%';
+      document.getElementById('sent-others').innerText = p3 + '%';
+      document.getElementById('bar-others').style.width = p3 + '%';
+    }
+
+    // Update risk districts
+    const riskContainer = document.getElementById('risk-districts');
+    riskContainer.innerHTML = '';
+    (risks.risks || []).slice(0, 4).forEach(r => {
+      const level = r.risk_level;
+      const color = level === 'Critical' ? 'error' : level === 'High' ? 'error' : level === 'Medium' ? 'secondary' : 'tertiary';
+      const icon = level === 'Critical' || level === 'High' ? 'warning' : level === 'Medium' ? 'trending_up' : 'shield';
+      riskContainer.innerHTML +=
+        `<div class="p-sm bg-${color}-container/10 border border-${color}/20 rounded flex justify-between items-center group cursor-pointer hover:bg-${color}-container/20 transition-all">
+          <div>
+            <div class="text-sm font-semibold">${r.ward_name}</div>
+            <div class="text-[10px] font-data-mono text-${color} uppercase">${r.risk_level} - ${r.district}</div>
+          </div>
+          <span class="material-symbols-outlined text-${color} text-md">${icon}</span>
+        </div>`;
+    });
+
+    // Update data stream from live API
+    const streamContainer = document.getElementById('data-stream');
+    streamContainer.innerHTML = '';
+    (stream.events || []).forEach(e => {
+      const colorMap = {tertiary: 'tertiary', secondary: 'secondary', error: 'error', green: 'tertiary', muted: 'outline'};
+      const c = colorMap[e.color] || 'outline';
+      streamContainer.innerHTML +=
+        `<div class="space-y-sm">
+          <div class="flex justify-between items-center font-data-mono text-[10px] text-on-surface-variant">
+            <span>${e.time}</span>
+            <span class="px-1 bg-${c}/20 text-${c} rounded">${e.label}</span>
+          </div>
+          <p class="text-xs leading-relaxed">${e.text}</p>
+          <div class="h-[1px] w-full bg-white/5"></div>
+        </div>`;
+    });
+
+    // Sync map colors with latest predictions
+    if (summary.district_details && districtLayer) {
+      currentPreds = {};
+      (summary.district_details || []).forEach(d => { currentPreds[d.district] = d; });
+      districtLayer.eachLayer(function(layer) {
+        const name = layer.feature.properties.name;
+        layer.setStyle(styleDistrict(layer.feature));
+      });
+    }
+
+    // Auto-refresh stream every 8 seconds
+    setTimeout(loadData, 8000);
+
+  } catch(err) {
+    console.log('API unavailable, retrying in 10s');
+    setTimeout(loadData, 10000);
+  }
+}
+loadData();
+</script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AP Command Center | Sentiment Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .glass-panel { background: rgba(31, 41, 55, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); transition: all 0.2s ease; }
+        .glass-panel:hover { border-color: rgba(255, 255, 255, 0.2); box-shadow: 0 0 15px rgba(173, 198, 255, 0.1); }
+        .narrative-river::-webkit-scrollbar { width: 4px; }
+        .narrative-river::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.1); }
+        .narrative-river::-webkit-scrollbar-thumb { background: rgba(173, 198, 255, 0.3); border-radius: 2px; }
+        @keyframes pulse-red { 0%, 100% { background-color: rgba(147, 0, 10, 0.8); box-shadow: 0 0 0 0 rgba(255, 180, 171, 0.4); } 50% { background-color: rgba(147, 0, 10, 1); box-shadow: 0 0 20px 5px rgba(255, 180, 171, 0.2); } }
+        .smoke-alert-active { animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .word-cloud-item { transition: transform 0.3s ease, opacity 0.3s ease; cursor: pointer; }
+        .word-cloud-item:hover { transform: scale(1.1); z-index: 10; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: { extend: {
+            "colors": { "background": "#091421", "on-surface-variant": "#c6c6cd", "inverse-surface": "#d9e3f6", "tertiary-fixed": "#d8e2ff", "inverse-on-surface": "#27313f", "primary-container": "#0f172a", "primary-fixed": "#dae2fd", "surface-container-high": "#212b39", "outline-variant": "#45464d", "secondary-fixed": "#ffddb8", "inverse-primary": "#565e74", "on-tertiary": "#002e6a", "outline": "#909097", "error-container": "#93000a", "on-tertiary-container": "#357df1", "surface-bright": "#303a48", "on-secondary": "#472a00", "secondary-container": "#ee9800", "on-primary-fixed-variant": "#3f465c", "on-secondary-container": "#5b3800", "tertiary": "#adc6ff", "on-tertiary-fixed": "#001a42", "surface-container-highest": "#2b3544", "on-surface": "#d9e3f6", "on-error": "#690005", "on-primary-fixed": "#131b2e", "surface-variant": "#2b3544", "primary": "#bec6e0", "tertiary-container": "#00163a", "on-primary": "#283044", "secondary-fixed-dim": "#ffb95f", "on-secondary-fixed-variant": "#653e00", "surface-container-lowest": "#050f1c", "primary-fixed-dim": "#bec6e0", "on-background": "#d9e3f6", "tertiary-fixed-dim": "#adc6ff", "on-error-container": "#ffdad6", "on-tertiary-fixed-variant": "#004395", "on-primary-container": "#798098", "on-secondary-fixed": "#2a1700", "secondary": "#ffb95f", "surface-container": "#16202e", "surface-dim": "#091421", "surface": "#091421", "surface-tint": "#bec6e0", "surface-container-low": "#121c2a", "error": "#ffb4ab" },
+            "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+            "spacing": { "unit": "4px", "sm": "8px", "xl": "48px", "xs": "4px", "lg": "24px", "container-max": "1440px", "md": "16px", "gutter": "20px" },
+            "fontFamily": { "data-mono": ["JetBrains Mono"], "title-md": ["Inter"], "display-lg": ["Geist"], "headline-lg": ["Geist"], "label-caps": ["JetBrains Mono"], "body-md": ["Inter"], "headline-lg-mobile": ["Geist"] },
+            "fontSize": { "data-mono": ["14px", {"lineHeight": "20px", "fontWeight": "400"}], "title-md": ["18px", {"lineHeight": "28px", "fontWeight": "600"}], "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}], "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}], "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500"}], "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}], "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}] }
+        } }
+      }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden h-screen flex flex-col">
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-lg h-xl bg-background/60 backdrop-blur-xl border-b border-white/10">
+<div class="flex items-center gap-lg">
+<h1 class="font-headline-lg text-headline-lg font-bold tracking-tighter text-primary">AP COMMAND CENTER</h1>
+<nav class="hidden md:flex gap-lg h-full items-center">
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-tertiary transition-colors duration-200" href="sentiment.html">LIVE FEED</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-tertiary transition-colors duration-200" href="gis-map.html">INTEL MAP</a>
+<a class="font-label-caps text-label-caps text-on-surface-variant hover:text-tertiary transition-colors duration-200" href="risk-matrix.html">RISK MATRIX</a>
+<a class="font-label-caps text-label-caps text-tertiary border-b-2 border-tertiary pb-1" href="turnout.html">FORECAST</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="bg-surface-container-low border-b border-outline-variant focus:border-tertiary focus:ring-0 text-label-caps font-label-caps pl-xl py-xs w-64 transition-all" placeholder="QUERY ENTITIES..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-tertiary transition-colors">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-tertiary transition-colors">settings</button>
+<button class="material-symbols-outlined text-primary hover:text-tertiary transition-colors">account_circle</button>
+</div>
+</header>
+<div class="flex flex-1 pt-xl">
+<aside class="fixed left-0 top-xl h-[calc(100vh-48px)] flex flex-col z-40 bg-surface-container-low/60 backdrop-blur-xl border-r border-white/10 w-[260px]">
+<div class="p-lg border-b border-white/10">
+<h2 class="font-title-md text-title-md text-primary">STRATEGIC INTEL</h2>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-60">ANDHRA PRADESH</p>
+</div>
+<nav class="flex-1 py-md">
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-all duration-200 group" href="gis-map.html">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">map</span>
+<span class="font-label-caps text-label-caps">GIS Map View</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm bg-tertiary/10 text-tertiary border-r-2 border-tertiary group" href="sentiment.html">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">analytics</span>
+<span class="font-label-caps text-label-caps">Sentiment Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-all duration-200 group" href="risk-matrix.html">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">warning</span>
+<span class="font-label-caps text-label-caps">Risk Matrix</span>
+</a>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-all duration-200 group" href="turnout.html">
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">query_stats</span>
+<span class="font-label-caps text-label-caps">Turnout Simulator</span>
+</a>
+</nav>
+<div class="p-md border-t border-white/10">
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-all duration-200" href="#"><span class="material-symbols-outlined">help</span><span class="font-label-caps text-label-caps">Support</span></a>
+<a class="flex items-center gap-md px-lg py-sm text-on-surface-variant hover:bg-white/5 transition-all duration-200" href="#"><span class="material-symbols-outlined text-green-400">check_circle</span><span class="font-label-caps text-label-caps">System Status</span></a>
+</div>
+</aside>
+<main class="ml-[260px] flex-1 p-lg overflow-y-auto bg-surface-dim relative">
+<div class="mb-lg smoke-alert-active rounded-xl p-md flex items-center justify-between border border-error/50">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-error text-[32px]" style="font-variation-settings: 'FILL' 1;">error</span>
+<div>
+<h3 class="font-label-caps text-label-caps text-error-container font-bold">CRITICAL NARRATIVE SPIKE: AMARAVATI SECTOR</h3>
+<p class="font-body-md text-on-error-container text-sm">Sudden 42% increase in negative sentiment regarding land pooling within the last 45 minutes.</p>
+</div>
+</div>
+<div class="flex gap-sm">
+<button class="bg-error-container text-on-error-container px-md py-xs font-label-caps text-label-caps rounded border border-on-error-container/20 hover:bg-on-error transition-colors">DEPLOY COUNTER-NARRATIVE</button>
+<button class="bg-black/20 text-on-error-container px-md py-xs font-label-caps text-label-caps rounded hover:bg-black/40 transition-colors">IGNORE</button>
+</div>
+</div>
+<div class="grid grid-cols-12 gap-lg h-full pb-xl">
+<div class="col-span-3 flex flex-col gap-md h-[calc(100vh-280px)]">
+<div class="flex items-center justify-between">
+<h4 class="font-label-caps text-label-caps text-primary border-l-4 border-tertiary pl-sm">NARRATIVE RIVER</h4>
+<span class="font-data-mono text-data-mono text-tertiary text-xs">LIVE_FEED v2.0</span>
+</div>
+<div class="flex-1 narrative-river overflow-y-auto space-y-md pr-sm" id="narrative-feed">
+<div class="glass-panel p-md border-l-2 border-error">
+<div class="flex justify-between items-start mb-sm">
+<span class="bg-error-container/30 text-error px-sm py-[2px] rounded text-[10px] font-label-caps">CRIMSON_CRITICAL</span>
+<span class="font-data-mono text-[10px] text-on-surface-variant" id="feed-time-1">12:44:02</span>
+</div>
+<p class="font-body-md text-sm leading-relaxed mb-md">ప్రజావేదిక కూల్చివేతపై ప్రతిపక్షాల తీవ్ర విమర్శలు - సోషల్ మీడియాలో వ్యతిరేక పవనాలు.</p>
+<div class="flex justify-between items-center opacity-60">
+<span class="font-data-mono text-[10px]">SOURCE: X_FIREHOSE</span>
+<span class="material-symbols-outlined text-sm">share</span>
+</div>
+</div>
+<div class="glass-panel p-md border-l-2 border-outline">
+<div class="flex justify-between items-start mb-sm">
+<span class="bg-surface-container-highest text-on-surface-variant px-sm py-[2px] rounded text-[10px] font-label-caps">NEUTRAL_SIGNAL</span>
+<span class="font-data-mono text-[10px] text-on-surface-variant">12:40:15</span>
+</div>
+<p class="font-body-md text-sm leading-relaxed mb-md">Central Budget allocation for AP remains focus of debate in regional TV news.</p>
+<div class="flex justify-between items-center opacity-60">
+<span class="font-data-mono text-[10px]">SOURCE: TV9_TRANSCRIPT</span>
+<span class="material-symbols-outlined text-sm">visibility</span>
+</div>
+</div>
+<div class="glass-panel p-md border-l-2 border-on-tertiary-container">
+<div class="flex justify-between items-start mb-sm">
+<span class="bg-tertiary/20 text-tertiary px-sm py-[2px] rounded text-[10px] font-label-caps">POSITIVE_VIBE</span>
+<span class="font-data-mono text-[10px] text-on-surface-variant">12:38:55</span>
+</div>
+<p class="font-body-md text-sm leading-relaxed mb-md">కొత్త పరిశ్రమల రాకతో యువతలో పెరిగిన విశ్వాసం - కియా ప్లాంట్ సమీపంలో సానుకూలత.</p>
+<div class="flex justify-between items-center opacity-60">
+<span class="font-data-mono text-[10px]">SOURCE: WHATSAPP_SENTINEL</span>
+<span class="material-symbols-outlined text-sm">trending_up</span>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-6 flex flex-col gap-lg">
+<div class="glass-panel p-lg relative h-[450px]">
+<div class="flex justify-between items-center mb-xl">
+<div>
+<h4 class="font-label-caps text-label-caps text-primary">NARRATIVE SHIFT VECTOR (24H)</h4>
+<p class="font-data-mono text-[10px] opacity-60 uppercase">D3-Engine v4.2 Overlay: Sentiment Magnitude vs. Velocity</p>
+</div>
+<div class="flex gap-md">
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-tertiary"></span><span class="font-label-caps text-[10px]">GOVERNANCE</span></div>
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-secondary"></span><span class="font-label-caps text-[10px]">WELFARE</span></div>
+<div class="flex items-center gap-xs"><span class="w-3 h-3 rounded-full bg-error"></span><span class="font-label-caps text-[10px]">OPPOSITION</span></div>
+</div>
+</div>
+<div class="absolute inset-x-lg bottom-xl h-64 border-l border-b border-white/10 flex items-end">
+<div class="absolute inset-0 grid grid-rows-4 w-full h-full">
+<div class="border-t border-white/5"></div>
+<div class="border-t border-white/5"></div>
+<div class="border-t border-white/5"></div>
+<div class="border-t border-white/5"></div>
+</div>
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 1000 200">
+<path class="drop-shadow-[0_0_8px_rgba(173,198,255,0.5)]" d="M0,150 Q100,50 200,120 T400,100 T600,180 T800,40 T1000,90" fill="none" stroke="#adc6ff" stroke-width="2"></path>
+<path class="drop-shadow-[0_0_8px_rgba(255,185,95,0.5)]" d="M0,180 Q150,140 300,160 T500,40 T750,100 T1000,150" fill="none" stroke="#ffb95f" stroke-width="2"></path>
+<path class="drop-shadow-[0_0_8px_rgba(255,180,171,0.5)]" d="M0,100 Q200,180 400,150 T650,20 T800,180 T1000,20" fill="none" stroke="#ffb4ab" stroke-width="2"></path>
+<circle class="animate-pulse" cx="650" cy="20" fill="#ffb4ab" r="4"></circle>
+<line stroke="#ffb4ab" stroke-dasharray="4" stroke-width="1" x1="650" x2="650" y1="0" y2="200"></line>
+</svg>
+<div class="absolute -bottom-lg left-0 right-0 flex justify-between font-data-mono text-[10px] opacity-40">
+<span>T-24H</span><span>T-18H</span><span>T-12H</span><span>T-06H</span><span>NOW</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-lg">
+<div class="glass-panel p-md flex items-center gap-md">
+<div class="w-16 h-16 rounded-lg bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all" data-alt="Official portrait of a prominent political leader from Andhra Pradesh" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvRbc8wtaZFPoJpGszWfVSDrddzx0oldavH9yGJWakbJEeHi2atJw6oF2qNJ8yV_paHRAoa98df4D1LnvF1J5II42i3FeWIuAkCSgp8sZXsWWIK-I1ebWL3Txfy6qFpq_i2_alCfwX_OpfhbrXfi28dPGEkXgV27c2zSTVcwmmSg03l3QrJyNRikb9iJukldzzllrViOovSESBWBazS_-h2FKQ2KtFOodAQEUONe_Zqi17iBQk3d0VOXZQTx3gIgVIQHdbDe800XkA"/>
+</div>
+<div class="flex-1">
+<h5 class="font-label-caps text-label-caps text-on-surface">LEADER_ALFA</h5>
+<div class="flex items-center justify-between mt-xs"><span class="font-data-mono text-xs text-on-surface-variant">FAVORABILITY</span><span class="font-data-mono text-xs text-tertiary" id="fav-alfa">74.2%</span></div>
+<div class="h-1 bg-surface-container-highest mt-sm rounded-full overflow-hidden"><div class="h-full bg-tertiary" id="bar-alfa" style="width:74%"></div></div>
+</div>
+</div>
+<div class="glass-panel p-md flex items-center gap-md">
+<div class="w-16 h-16 rounded-lg bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all" data-alt="Professional political candidate portrait of an opposition leader" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8KUZ1eO6dDOfPGRvYq-g_60e_Nzr-oGIn8Yd0lN8PfPfJPBa3WbpQ9Ag9x4ayz1h4xZGp0h6UzdUkgXRJYoobyy1jy-AI_Q_TmzU7PNHgjRBk6CYG6VYTxIA5H7dVkOzuMaOHAxDlAYqFuMN6XCyYF2QqQVma6GwUMbq334NF3ZVSXQS4iqzN-J4dnNmDFJ-98u9-efjuCl96LSJCqgE1ZBINiYLnOLd9co5O2fEMhYPfNYxv6oNHVETWCYXIv5vM0sKOCVjIG67c"/>
+</div>
+<div class="flex-1">
+<h5 class="font-label-caps text-label-caps text-on-surface">LEADER_OMEGA</h5>
+<div class="flex items-center justify-between mt-xs"><span class="font-data-mono text-xs text-on-surface-variant">FAVORABILITY</span><span class="font-data-mono text-xs text-error" id="fav-omega">32.8%</span></div>
+<div class="h-1 bg-surface-container-highest mt-sm rounded-full overflow-hidden"><div class="h-full bg-error" id="bar-omega" style="width:32%"></div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="col-span-3 flex flex-col gap-md">
+<div class="glass-panel p-lg flex-1 flex flex-col overflow-hidden">
+<div class="flex items-center justify-between mb-lg">
+<h4 class="font-label-caps text-label-caps text-primary">SEMANTIC CLOUD</h4>
+<span class="material-symbols-outlined text-on-surface-variant">language</span>
+</div>
+<div class="flex-1 relative flex flex-wrap content-center justify-center gap-md text-center">
+<span class="word-cloud-item text-display-lg text-tertiary font-bold px-md">రాజధాని</span>
+<span class="word-cloud-item text-headline-lg text-on-surface opacity-90 px-sm">Governance</span>
+<span class="word-cloud-item text-title-md text-secondary opacity-80 px-sm">అభివృద్ధి</span>
+<span class="word-cloud-item text-body-md text-error opacity-60 px-sm">Protest</span>
+<span class="word-cloud-item text-headline-lg text-primary opacity-90 px-sm">Polavaram</span>
+<span class="word-cloud-item text-display-lg text-white font-extrabold px-md">సంక్షేమం</span>
+<span class="word-cloud-item text-body-md text-on-surface-variant opacity-50 px-sm">Budget</span>
+<span class="word-cloud-item text-title-md text-tertiary opacity-70 px-sm">విజన్</span>
+<span class="word-cloud-item text-headline-lg text-secondary opacity-90 px-sm">Investors</span>
+<span class="word-cloud-item text-body-md text-on-surface opacity-40 px-sm">Infrastructure</span>
+<span class="word-cloud-item text-title-md text-error-container opacity-80 px-sm">అవినీతి</span>
+<span class="word-cloud-item text-headline-lg text-tertiary-fixed-dim px-sm">IT_JOBS</span>
+<span class="word-cloud-item text-body-md text-on-surface-variant opacity-40 px-sm">మ్యానిఫెస్టో</span>
+<span class="word-cloud-item text-display-lg text-secondary font-bold px-md">Farmers</span>
+<span class="word-cloud-item text-title-md text-primary opacity-60 px-sm">రైతు భరోసా</span>
+<span class="word-cloud-item text-body-md text-white opacity-40 px-sm">Connectivity</span>
+</div>
+<div class="mt-lg pt-lg border-t border-white/5 space-y-md">
+<div class="flex justify-between items-center"><span class="font-label-caps text-[10px] text-on-surface-variant">CLOUD_DENSITY</span><span class="font-data-mono text-[10px]">HIGH (98.2%)</span></div>
+<div class="flex justify-between items-center"><span class="font-label-caps text-[10px] text-on-surface-variant">NLP_CONFIDENCE</span><span class="font-data-mono text-[10px]">0.925 SIGMA</span></div>
+<button class="w-full border border-white/10 py-sm font-label-caps text-label-caps hover:bg-white/5 transition-colors">DOWNLOAD SEMANTIC REPORT</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script>
+const API_BASE = 'http://localhost:8100/api';
+
+async function loadLiveData() {
+    try {
+        const [streamRes, sentRes, favRes, summaryRes] = await Promise.all([
+            fetch(API_BASE + '/intel/stream'),
+            fetch(API_BASE + '/intel/sentiment'),
+            fetch(API_BASE + '/intel/favorability'),
+            fetch(API_BASE + '/summary')
+        ]);
+        const stream = await streamRes.json();
+        const sent = await sentRes.json();
+        const fav = await favRes.json();
+        const summary = await summaryRes.json();
+
+        // Update narrative feed with live events
+        const feed = document.querySelector('.narrative-river');
+        if (feed && stream.events) {
+            const time = new Date().toTimeString().slice(0,8);
+            feed.innerHTML = stream.events.map(e => {
+                const borderMap = {tertiary: 'border-tertiary', secondary: 'border-secondary', error: 'border-error', green: 'border-tertiary', muted: 'border-outline'};
+                const labelMap = {tertiary: 'text-tertiary bg-tertiary/20', secondary: 'text-secondary bg-secondary/20', error: 'text-error bg-error-container/30', green: 'text-tertiary bg-tertiary/20', muted: 'text-on-surface-variant bg-surface-container-highest'};
+                const border = borderMap[e.color] || 'border-outline';
+                const labelClass = labelMap[e.color] || 'text-on-surface-variant bg-surface-container-highest';
+                return `<div class="glass-panel p-md border-l-2 ${border}">
+                    <div class="flex justify-between items-start mb-sm">
+                        <span class="${labelClass} px-sm py-[2px] rounded text-[10px] font-label-caps">${e.label}</span>
+                        <span class="font-data-mono text-[10px] text-on-surface-variant">${e.time}</span>
+                    </div>
+                    <p class="font-body-md text-sm leading-relaxed mb-md">${e.text}</p>
+                    <div class="flex justify-between items-center opacity-60">
+                        <span class="font-data-mono text-[10px]">SOURCE: API_LIVE</span>
+                        <span class="material-symbols-outlined text-sm">share</span>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // Update favorability
+        if (fav.leaders && fav.leaders.length >= 2) {
+            const alfa = fav.leaders[0];
+            const omega = fav.leaders[1];
+            document.getElementById('fav-alfa').innerText = alfa.favorability + '%';
+            document.getElementById('bar-alfa').style.width = alfa.favorability + '%';
+            document.getElementById('fav-omega').innerText = omega.favorability + '%';
+            document.getElementById('bar-omega').style.width = omega.favorability + '%';
+        }
+
+        // Update sentiment metrics
+        const sentEl = document.querySelector('.font-data-mono.text-data-mono.text-tertiary');
+        if (sentEl) {
+            const cloudDensity = document.querySelectorAll('.flex.justify-between.items-center .font-data-mono');
+            if (cloudDensity.length >= 2) {
+                cloudDensity[1].innerText = sent.overall_sentiment.toFixed(3) + ' SIGMA';
+            }
+        }
+
+    } catch(err) {
+        console.log('API unavailable', err);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadLiveData();
+    setInterval(loadLiveData, 10000);
+
+    const feed = document.querySelector('.narrative-river');
+    let autoScroll = true;
+    if (feed) {
+        feed.addEventListener('mouseenter', () => autoScroll = false);
+        feed.addEventListener('mouseleave', () => autoScroll = true);
+    }
+    const smokeAlert = document.querySelector('.smoke-alert-active');
+    if (smokeAlert) {
+        setTimeout(() => {
+            setInterval(() => { smokeAlert.style.filter = 'brightness(1.5)'; setTimeout(() => smokeAlert.style.filter = 'brightness(1)', 100); }, 4000);
+        }, 1000);
+    }
+});
+</script>
+</body>
+</html>
